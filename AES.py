@@ -92,32 +92,6 @@ class AES:
                          ^ self.round_keys[i - 1][j]
                     self.round_keys[i].append(byte)
 
-    def encrypt(self, plaintext):
-        self.plain_state = plaintext_to_matrix(plaintext)
-        self.__add_round_key(self.plain_state, self.round_keys[:4])
-
-        for i in range(1, 10):
-            self.__round_encrypt(self.plain_state, self.round_keys[4 * i : 4 * (i + 1)])
-
-        self.__sub_bytes(self.plain_state)
-        self.__shift_rows(self.plain_state)
-        self.__add_round_key(self.plain_state, self.round_keys[40:])
-
-        return matrix_to_plaintext(self.plain_state)
-
-    def decrypt(self, ciphertext):
-        self.cipher_state = plaintext_to_matrix(ciphertext)
-        self.__add_round_key(self.cipher_state, self.round_keys[40:])
-        self.__inv_shift_rows(self.cipher_state)
-        self.__inv_sub_bytes(self.cipher_state)
-
-        for i in range(9, 0, -1):
-            self.__round_decrypt(self.cipher_state, self.round_keys[4 * i : 4 * (i + 1)])
-
-        self.__add_round_key(self.cipher_state, self.round_keys[:4])
-
-        return matrix_to_plaintext(self.cipher_state)
-
     def __add_round_key(self, s, k):
         for i in range(4):
             for j in range(4):
@@ -176,18 +150,49 @@ class AES:
             s[i][2] ^= u
             s[i][3] ^= v
         self.__mix_columns(s)
+    
+    def encrypt(self, plaintext):
+        self.plain_state = plaintext_to_matrix(plaintext)
+        self.__add_round_key(self.plain_state, self.round_keys[:4])
 
-if __name__ == "__main__":
+        for i in range(1, 10):
+            self.__round_encrypt(self.plain_state, self.round_keys[4 * i : 4 * (i + 1)])
+
+        self.__sub_bytes(self.plain_state)
+        self.__shift_rows(self.plain_state)
+        self.__add_round_key(self.plain_state, self.round_keys[40:])
+
+        return matrix_to_plaintext(self.plain_state)
+
+    def decrypt(self, ciphertext):
+        self.cipher_state = plaintext_to_matrix(ciphertext)
+        self.__add_round_key(self.cipher_state, self.round_keys[40:])
+        self.__inv_shift_rows(self.cipher_state)
+        self.__inv_sub_bytes(self.cipher_state)
+
+        for i in range(9, 0, -1):
+            self.__round_decrypt(self.cipher_state, self.round_keys[4 * i : 4 * (i + 1)])
+
+        self.__add_round_key(self.cipher_state, self.round_keys[:4])
+
+        return matrix_to_plaintext(self.cipher_state)
+
+def main():
     secret_key   = 'somepass'.encode('utf-8')
-    message    = 'Helloworld!'.encode('utf-8')
+    message    = 'Hello World!'.encode('utf-8')
     master_key = int( secret_key.hex(), 16 ) 
     plaintext  = int( message.hex(), 16 ) 
     print('secret key:', secret_key )
     print('original message:', message )
-    algorithm_AES = AES(master_key)
-    encrypted = algorithm_AES.encrypt(plaintext)
+    aes = AES(master_key)
+    encrypted = aes.encrypt(plaintext)
     print('encrypted:', hex(encrypted) )
-    decrypted = algorithm_AES.decrypt(encrypted)
+    decrypted = aes.decrypt(encrypted)
     decrypted = bytes.fromhex((hex(decrypted)[2:]))
-    print('decrypted message:',decrypted  )
-    
+    if message == decrypted:
+        print('Thats Great,Decrypted successfull!')
+        print(f'message: {message}\nencrypted message: {encrypted}'
+              f'\ndecrypted message: {decrypted}')
+
+if __name__ == "__main__":
+    main()
