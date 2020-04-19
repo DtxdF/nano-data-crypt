@@ -231,20 +231,3 @@ class AES:
         self.add_round_key(self.cipher_state, self.round_keys[:4])
 
         return self.matrix_to_plaintext(self.cipher_state)
-
-def main():
-    secret_key   = 'somepass'.encode('utf-8')
-    message    = 'Hello World!'.encode('utf-8')
-    secret_key = int( secret_key.hex(), 16 ) 
-    plaintext  = int( message.hex(), 16 ) 
-    aes = AES(secret_key)
-    encrypted = aes.encrypt(plaintext)
-    decrypted = aes.decrypt(encrypted)
-    decrypted = bytes.fromhex((hex(decrypted)[2:]))
-    if message == decrypted:
-        print('Thats Great,Decrypted successfull!')
-        print(f'Original Message: {message}\nEncrypted Message: {encrypted}'
-              f'\nDecrypted Message: {decrypted}')
-
-if __name__ == "__main__":
-    main()

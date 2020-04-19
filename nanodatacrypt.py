@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 
 import os
+import sys
+import getopt
+import getpass
+
+from algorithms.RSA import RSA
+from algorithms.AES import AES
 
 class NanoDataCrypt:
     
@@ -27,10 +33,61 @@ class NanoDataCrypt:
     def file_decrypt(self):
         pass
     
-def main():
-    datacrypt = NanoDataCrypt('hi.txt')
-    message = datacrypt.get_message()
-    datacrypt.file_encrypt(message)
+    def rsa(self):
+        rsa = RSA()
+        keys = rsa.generate_keys(307, 311)
+        print(keys)
+        message = 'Hello World!'
+        encrypted_message = rsa.encrypt(message)
+        decrypted_message = rsa.decrypt(encrypted_message)
+        if message == decrypted_message:
+            print('Thats Great,Decrypted successfull!')
+            print(f'Original Message: {message}\nEncrypted Message: {encrypted_message}'
+            f'\nDecrypted Message: {decrypted_message}')
+        else:
+            print('Ups!, Someting wrong :C')
+            
+    def aes(self):
+        secret_key   = 'somepass'.encode('utf-8')
+        message    = 'Hello World!'.encode('utf-8')
+        secret_key = int( secret_key.hex(), 16 ) 
+        plaintext  = int( message.hex(), 16 ) 
+        aes = AES(secret_key)
+        encrypted = aes.encrypt(plaintext)
+        decrypted = aes.decrypt(encrypted)
+        decrypted = bytes.fromhex((hex(decrypted)[2:]))
+        if message == decrypted:
+            print('Thats Great,Decrypted successfull!')
+            print(f'Original Message: {message}\nEncrypted Message: {encrypted}'
+                f'\nDecrypted Message: {decrypted}')
     
-if __name__=="__main__":
-    main()
+    @staticmethod
+    def usage():
+        print ('\t  Usage: nanodatacrypt [options] | <misc>' )
+        print ('\t  -a <aes>: algorithm simetric AES')
+        print ('\t  -r <rsa>: algorithm asymetric RSA')
+        print ('\t  -h <help>')
+    
+def main(argv):
+    try:
+        opts, args = getopt.getopt(argv,'h:a:r',['help','aes=','rsa='])
+    except getopt.GetoptError:
+        NanoDataCrypt.usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            NanoDataCrypt.usage()
+            sys.exit()
+        elif opt in ('-a', '--aes'):
+            datacrypt = NanoDataCrypt('hi.txt')
+            message = datacrypt.get_message()
+            datacrypt.file_encrypt(message)
+            datacrypt.aes()
+        elif opt in ('-r', '--rsa'):
+            datacrypt = NanoDataCrypt('hi.txt')
+            message = datacrypt.get_message()
+            datacrypt.file_encrypt(message)
+            datacrypt.rsa()
+    
+if __name__ == '__main__':
+    main(sys.argv[1:])
