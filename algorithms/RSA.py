@@ -65,22 +65,3 @@ class RSA():
         message_encrypted_chars = [ord(char) for char in message_encrypted]
         message = ''.join([chr(char**self.private_key % self.prime_factor) for char in message_encrypted_chars])
         return message
-
-def main():
-    # init RSA algorithm
-    rsa = RSA()
-    # select 2 random prime numbers (depending on their length varies your security)
-    keys = rsa.generate_keys(307, 311)
-    print(keys)
-    message = 'Hello World!'
-    encrypted_message = rsa.encrypt(message)
-    decrypted_message = rsa.decrypt(encrypted_message)
-    if message == decrypted_message:
-        print('Thats Great,Decrypted successfull!')
-        print(f'Original Message: {message}\nEncrypted Message: {encrypted_message}'
-           f'\nDecrypted Message: {decrypted_message}')
-    else:
-        print('Ups!, Someting wrong :C')
-
-if __name__=="__main__":
-    main()
