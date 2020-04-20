@@ -11,55 +11,46 @@ from algorithms.AES import AES
 class NanoDataCrypt:
     
     def __init__(self,filename):
-        self.filename = filename
-        self.outfile = filename + '.cpt'
+        self._filename = filename
+        self._encrypted_file = filename + '.cpt'
         
     def __repr__(self):
-        return 'NanoDataCrypt({})'.format(self.filename)
+        return 'NanoDataCrypt({})'.format(self._filename)
     
+    def get_filename(self): 
+        return self._filename
+    
+    def get_encrypted_file(self): 
+        return self._encrypted_file
+    
+    @staticmethod
     def title(self):
         pass
     
     def get_message(self):
-        with open(self.filename,'r') as file:
-            data = file.read().replace('\n', '')
+        with open(self._filename,'r') as file:
+            plaintext = file.read().replace('\n', '')
         file.close()
-        return data
+        return plaintext
     
-    def file_encrypt(self,message):
-        with open(self.outfile, 'a'):
-            os.utime(self.outfile, None)
+    def get_encrypted_message(self):
+        with open(self._encrypted_file,'r') as file:
+            message_encryted = file.read().replace('\n', '')
+        file.close()
+        return message_encryted
     
-    def file_decrypt(self):
-        pass
-    
-    def rsa(self):
-        rsa = RSA()
-        keys = rsa.generate_keys(307, 311)
-        print(keys)
-        message = 'Hello World!'
-        encrypted_message = rsa.encrypt(message)
-        decrypted_message = rsa.decrypt(encrypted_message)
-        if message == decrypted_message:
+    def assert_plaintext(self,plaintext,encrypted,decrypted):
+        if plaintext == decrypted:
             print('Thats Great,Decrypted successfull!')
-            print(f'Original Message: {message}\nEncrypted Message: {encrypted_message}'
-            f'\nDecrypted Message: {decrypted_message}')
+            print(f'Original Message: {plaintext}\nEncrypted Message: {encrypted}'
+            f'\nDecrypted Message: {decrypted}')
         else:
             print('Ups!, Someting wrong :C')
-            
-    def aes(self):
-        secret_key   = 'somepass'.encode('utf-8')
-        message    = 'Hello World!'.encode('utf-8')
-        secret_key = int( secret_key.hex(), 16 ) 
-        plaintext  = int( message.hex(), 16 ) 
-        aes = AES(secret_key)
-        encrypted = aes.encrypt(plaintext)
-        decrypted = aes.decrypt(encrypted)
-        decrypted = bytes.fromhex((hex(decrypted)[2:]))
-        if message == decrypted:
-            print('Thats Great,Decrypted successfull!')
-            print(f'Original Message: {message}\nEncrypted Message: {encrypted}'
-                f'\nDecrypted Message: {decrypted}')
+    
+    def file_encrypt(self,message_encryted):
+        file = open(self._encrypted_file,'w')
+        file.write(str(message_encryted))
+        file.close()
     
     @staticmethod
     def usage():
@@ -72,8 +63,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,'har',['help','aes','rsa'])
         datacrypt = NanoDataCrypt(args[0])
-        message = datacrypt.get_message()
-        datacrypt.file_encrypt(message)
+        plaintext = datacrypt.get_message()
     except getopt.GetoptError:
         NanoDataCrypt.usage()
         sys.exit(2)
@@ -82,9 +72,24 @@ def main(argv):
         if opt in ('-h', '--help'):
             NanoDataCrypt.usage()
         elif opt in ('-a', '--aes'):
-            datacrypt.aes()
+            secret_key   = 'somepass'.encode('utf-8')
+            plaintext    = plaintext.encode('utf-8')
+            secret_key = int( secret_key.hex(), 16 ) 
+            message_int  = int( plaintext.hex(), 16 ) 
+            aes = AES(secret_key)
+            encrypted = aes.encrypt(message_int)
+            datacrypt.file_encrypt(encrypted)
+            #decrypted = aes.decrypt(encrypted)
+            #decrypted = bytes.fromhex((hex(decrypted)[2:]))
+            #datacrypt.assert_plaintext(plaintext,encrypted,decrypted)
         elif opt in ('-r', '--rsa'):
-            datacrypt.rsa()
+            rsa = RSA()
+            keys = rsa.generate_keys(307, 311)
+            print(keys)
+            encrypted = rsa.encrypt(plaintext)
+            datacrypt.file_encrypt(encrypted)
+            decrypted = rsa.decrypt(encrypted)
+            datacrypt.assert_plaintext(plaintext,encrypted,decrypted)
         else:
             assert False, "unhandled option"
     sys.exit()
