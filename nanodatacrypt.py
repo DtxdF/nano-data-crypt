@@ -64,30 +64,30 @@ class NanoDataCrypt:
     @staticmethod
     def usage():
         print ('\t  Usage: nanodatacrypt [options] | <misc>' )
-        print ('\t  -a <aes>: algorithm simetric AES')
-        print ('\t  -r <rsa>: algorithm asymetric RSA')
+        print ('\t  -a <aes>: simetric algorithm  [ AES ]')
+        print ('\t  -r <rsa>: asymetric algorithm [ RSA ]')
         print ('\t  -h <help>')
     
 def main(argv):
     try:
-        opts, args = getopt.getopt(argv,'h:a:r',['help','aes=','rsa='])
+        opts, args = getopt.getopt(argv,'har',['help','aes','rsa'])
+        datacrypt = NanoDataCrypt(args[0])
+        message = datacrypt.get_message()
+        datacrypt.file_encrypt(message)
     except getopt.GetoptError:
         NanoDataCrypt.usage()
         sys.exit(2)
-    for opt, arg in opts:
+    for opt , arg in opts:
+        print(opt,args[0])
         if opt in ('-h', '--help'):
             NanoDataCrypt.usage()
-            sys.exit()
         elif opt in ('-a', '--aes'):
-            datacrypt = NanoDataCrypt('hi.txt')
-            message = datacrypt.get_message()
-            datacrypt.file_encrypt(message)
             datacrypt.aes()
         elif opt in ('-r', '--rsa'):
-            datacrypt = NanoDataCrypt('hi.txt')
-            message = datacrypt.get_message()
-            datacrypt.file_encrypt(message)
             datacrypt.rsa()
-    
+        else:
+            assert False, "unhandled option"
+    sys.exit()
+            
 if __name__ == '__main__':
     main(sys.argv[1:])
