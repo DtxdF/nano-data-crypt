@@ -9,7 +9,7 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     RSA is a public-key cryptographic algorithm based on the difficulty of factoring large integers (prime numbers).
     The algorithm is typically used for both encryption and authentication (digital signature).
  # Usage nano data crypt
-  Usage: nanodatacrypt [options] | <misc>' 
-         -a <aes>: simetric algorithm  [ AES ]
-         -r <rsa>: asymetric algorithm [ RSA ]
-         -h <help>')
+  Usage: nanodatacrypt [options] | <misc>' <br>
+         -a <aes>: simetric algorithm  [ AES ]  <br>
+         -r <rsa>: asymetric algorithm [ RSA ]  <br>
+         -h <help>  <br>
