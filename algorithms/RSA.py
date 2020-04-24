@@ -6,6 +6,19 @@ class RSA():
     RSA is a public-key cryptographic algorithm based on the difficulty of factoring large integers (prime numbers).
     The algorithm is typically used for both encryption and authentication (digital signature).
     """
+    def __init__(self):
+        self._prime_factor = 0
+        self._private_key = 0
+        self._public_key = 0
+    
+    def get_prime_factor(self): 
+        return self._prime_factor
+    
+    def get_private_key(self): 
+        return self._private_key
+    
+    def get_public_key(self): 
+        return self._public_key
     
     @staticmethod
     def gcd(a, b):
@@ -24,7 +37,7 @@ class RSA():
         The private key is ( n , d ) , i.e. the modulus and the decryption exponent, which must be kept secret.
         """
         # Choose two different prime numbers.
-        self.prime_factor = prime_a * prime_b
+        self._prime_factor = prime_a * prime_b
         
         #  φ(Phi) is Euler's function to calculate: φ(n) = (p-1)*(q-1) ] based on the following two properties of Euler's function 
         #  [ φ(p) = p -1 if p is prime ] and [ If m and n are prime to each other, then φ ( m n ) = φ ( m ) φ ( n ) ].
@@ -37,14 +50,14 @@ class RSA():
             if self.gcd(i, totient) == 1:
                 public_keys.append(i)
         # select a positive integer smaller than φ ( n ) that is coprime with φ ( n ).
-        self.public_key = public_keys[4]
-        self.private_key = 0
+        self._public_key = public_keys[4]
+        self._private_key = 0
         n = -1
         while n != 0:
-            self.private_key += 1
+            self._private_key += 1
             # Calculate n which is the product of p and q (selected prime numbers). n is used as the module for both public and private keys. 
-            n = (self.public_key * self.private_key - 1) % totient
-        return (self.prime_factor, self.public_key, self.private_key)
+            n = (self._public_key * self._private_key - 1) % totient
+        return (self._prime_factor, self._public_key, self._private_key)
 
     @classmethod
     def encrypt(self, plaintext):
@@ -54,7 +67,7 @@ class RSA():
         """
         plaintext_chars = [ord(char) for char in plaintext]
         # Now to encrypt sol it is sufficient to calculate by the operation c ≡ m e ( mod n ) 
-        message_encrypted = ''.join([chr(char**self.public_key % self.prime_factor) for char in plaintext_chars])
+        message_encrypted = ''.join([chr(char**self._public_key % self._prime_factor) for char in plaintext_chars])
         return message_encrypted
 
     @classmethod
@@ -63,5 +76,5 @@ class RSA():
         Person B can recover m from c using its private key exponent d by the following calculation: m ≡ c d ( mod n )  
         """
         message_encrypted_chars = [ord(char) for char in message_encrypted]
-        message = ''.join([chr(char**self.private_key % self.prime_factor) for char in message_encrypted_chars])
+        message = ''.join([chr(char**self._private_key % self._prime_factor) for char in message_encrypted_chars])
         return message
