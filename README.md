@@ -11,16 +11,25 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     Asymmetric key cryptography algorithm based ( public key cryptography and private key cryptography )
     RSA is a public-key cryptographic algorithm based on the difficulty of factoring large integers (prime numbers).
     The algorithm is typically used for both encryption and authentication (digital signature).
- # Usage nano data crypt
-  Usage: nanodatacrypt [options] | <misc>' <br>
+
+# Usage nano data crypt
+  Usage: nanodatacrypt [option]  <file> [argument] <br>
+         -e <encrypt> <br>
+         -d <encrypt> <br>
          -a <aes>: simetric algorithm  [ AES ]  <br>
          -r <rsa>: asymetric algorithm [ RSA ]  <br>
          -h <help>  <br>
-
+# Example
+    ./nanodatacrypt.py -a myfile.txt -e<br>
+    ./nanodatacrypt.py -a myfile.txt -d<br>
+    python nanodatacrypt.py --aes myfile.txt --encrypt <br>
+    python nanodatacrypt.py --aes myfile.txt --decrypt <br>
+    
+    
 # Requirements
 The project can be used with __python3.8__for to build. However, it requires __python3.*__ as minimum.
 
-# Installation of Package GCC
+# Installation of Package python
 ```sh
 # normally this package is already installed in most unix-based 
 # distributions e.g. GNU/Linux, Freebsd, etc.
