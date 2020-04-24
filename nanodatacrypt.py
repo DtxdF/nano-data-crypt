@@ -58,7 +58,9 @@ class NanoDataCrypt:
     
     @staticmethod
     def usage():
-        print ('\t  Usage: nanodatacrypt [options] | <misc>' )
+        print ('\t  Usage: nanodatacrypt [option] <file> [args]' )
+        print ('\t  -e <encrypt> [args]')
+        print ('\t  -d <decrypt> [args]')
         print ('\t  -a <aes>: simetric algorithm  [ AES ]')
         print ('\t  -r <rsa>: asymetric algorithm [ RSA ]')
         print ('\t  -h <help>')
