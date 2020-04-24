@@ -13,12 +13,12 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     The algorithm is typically used for both encryption and authentication (digital signature).
 
 # Usage nano data crypt
-  Usage: nanodatacrypt [option]  <file> [argument] <br>
-         -e <encrypt> <br>
-         -d <encrypt> <br>
-         -a <aes>: simetric algorithm  [ AES ]  <br>
-         -r <rsa>: asymetric algorithm [ RSA ]  <br>
-         -h <help>  <br>
+  Usage: nanodatacrypt [option]  <file> [argument] 
+         -e --encrypt 
+         -d --encrypt 
+         -a <aes>: simetric algorithm  [ AES ] 
+         -r <rsa>: asymetric algorithm [ RSA ]
+         -h <help>  
 # Example
     ./nanodatacrypt.py -a myfile.txt -e<br>
     ./nanodatacrypt.py -a myfile.txt -d<br>
