@@ -15,7 +15,7 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     The basic principle on which the RSA algorithm is based is the search to find three very large positive integers e,
     d and n, so that with a modular exponent for all integers m { 0 ≤ m < n }: 
     
-    ![equation](http://www.sciweavers.org/tex2img.php?eq=(m%5Ee)%5Ed%29&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=)
+    ![equation](http://www.sciweavers.org/tex2img.php?eq=((m%5Ee)%5Ed=%29&bc=White&fc=Black&im=jpg&fs=12&ff=arev&edit=)
 # Usage nano data crypt
   Usage: nanodatacrypt [option]  <file> [argument] <br>
          -e --encrypt  <br>
