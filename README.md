@@ -30,7 +30,7 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     
     
 # Requirements
-The project can be used with __python3.8__for to build. However, it requires __python3.*__ as minimum.
+The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
 
 # Installation of Package python
 ```sh
