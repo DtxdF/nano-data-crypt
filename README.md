@@ -2,7 +2,7 @@
 [![GitHub release](https://img.shields.io/badge/release-v1.0.0-green)](https://github.com/d4rk6h05t/nano-data-crypt)
 
 # nano-data-crypt
-Nano data encrypt and decrypt is small application of  implementation of the functioning of a  system cryptography ( symmetric and  asymmetric key cryptography ) . Application written in Python3.8 to  encrypt data on a small scale, school project for the subject of cibersecurity. 
+Nano data encrypt and decrypt is small application of  implementation of the functioning of a  system cryptography ( symmetric and  asymmetric key cryptography ) . Application written in Python3.8 to  encrypt data on a small scale, school project for the subject of cibersecurity. At the moment this app can only encript txt files.
 # Algorithms
   - __AES__
     AES Is Symmetric key cryptography algorithm ( secret key cryptograph ) AES ( Advanced Encryption Standard )
