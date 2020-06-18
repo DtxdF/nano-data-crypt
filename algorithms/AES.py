@@ -4,22 +4,25 @@ class AES:
     """
     AES Is Symmetric key cryptography algorithm ( secret key cryptograph ) AES ( Advanced Encryption Standard )
     The Advanced Encryption Standard (AES), also known by its original name Rijndael
+    At the moment only can suppor strngth length AES-128 bits this algorithm
     """
-    
+    MATRIX_RANGE = 4
     # rcon Round Constant (Key schedule)
     # AES uses up to rcon 10 for AES-128, up to rcon 8 for AES-192, and up to rcon 7 for AES-256. The key schedule.
     
-    rcon_a = ( 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a )
+    RCON_A = ( 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36 )
     
-    rcon_b = (
+    RCON_B = ( 0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a )
+    
+    RCON_C = (
         0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36, 0x6C, 0xD8, 0xAB, 0x4D, 0x9A,
         0x2F, 0x5E, 0xBC, 0x63, 0xC6, 0x97, 0x35, 0x6A, 0xD4, 0xB3, 0x7D, 0xFA, 0xEF, 0xC5, 0x91, 0x39,
     )
 
-    # S-Box ( substitution-box ) It serves to obscure the relationship between the key and the ciphertext, a property of Shannon's confusion.
+    # S-Box ( c ) It serves to obscure the relationship between the key and the ciphertext, a property of Shannon's confusion.
     # S-box takes m number of input bits, m, and transforms them into n number of output bits, n, where n is not necessarily equal to m. 
     # An m×n S-box can be implemented as a lookup table with 2m of n-bit words each. 
-    sbox = (
+    SUBSTITUTION_BOX = (
         0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76,
         0xCA, 0x82, 0xC9, 0x7D, 0xFA, 0x59, 0x47, 0xF0, 0xAD, 0xD4, 0xA2, 0xAF, 0x9C, 0xA4, 0x72, 0xC0,
         0xB7, 0xFD, 0x93, 0x26, 0x36, 0x3F, 0xF7, 0xCC, 0x34, 0xA5, 0xE5, 0xF1, 0x71, 0xD8, 0x31, 0x15,
@@ -39,7 +42,7 @@ class AES:
     )
 
     # Inverse S -Box The Rijndael S-box is a substitution box (lookup table) used in the Rijndael cipher
-    inversesbox = (
+    INVERSE_SUBSTITUTION_BOX = (
         0x52, 0x09, 0x6A, 0xD5, 0x30, 0x36, 0xA5, 0x38, 0xBF, 0x40, 0xA3, 0x9E, 0x81, 0xF3, 0xD7, 0xFB,
         0x7C, 0xE3, 0x39, 0x82, 0x9B, 0x2F, 0xFF, 0x87, 0x34, 0x8E, 0x43, 0x44, 0xC4, 0xDE, 0xE9, 0xCB,
         0x54, 0x7B, 0x94, 0x32, 0xA6, 0xC2, 0x23, 0x3D, 0xEE, 0x4C, 0x95, 0x0B, 0x42, 0xFA, 0xC3, 0x4E,
@@ -58,36 +61,44 @@ class AES:
         0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D,
     )
     
-    ntime       = lambda self, n: (((n << 1) ^ 0x1B) & 0xFF) if (n & 0x80) else (n << 1)
+    ntime = lambda self, n: (((n << 1) ^ 0x1B) & 0xFF) if (n & 0x80) else (n << 1)
     
     # In the MixColumns step, the four bytes of each column of the state are combined using an invertible linear transformation. 
     # The MixColumns function takes four bytes as input and outputs four bytes, where each input byte affects all four output bytes. 
     # Together with ShiftRows, MixColumns provides diffusion in the cipher. 
-    mix_columns = lambda self, s : [ self.mix_single_column(s[i]) for i in range(4) ]
+    mix_columns = lambda self, s : [ self.mix_single_column(s[i]) for i in range(self.MATRIX_RANGE) ]
     
     def __init__(self, secret_key):
         self.key_expansion(secret_key)
+        
+    def get_no_rounds(self, length_bits):
+        """
+        Return amount rounds correponding length bits
+        """
+        bits_round = { 
+            128: 10, 
+            192: 12, 
+            256: 14,
+        } 
+        return bits_round.get(length_bits, 'bits_keys')
     
-    def plaintext_to_matrix(self,plaintext):
+    def plaintext_to_matrix(self, plaintext):
         """
         Pass a message in plaintext to simple bytes matrix
         """
-        matrix = []
+        matrix = list()
         for i in range(16):
             byte = (plaintext >> (8 * (15 - i))) & 0xFF
-            if i % 4 == 0:
-                matrix.append([byte])
-            else:
-                matrix[ (int)(i / 4) ].append(byte)
+            matrix.append([byte]) if i % self.MATRIX_RANGE == 0 else matrix[ (int)(i / 4) ].append(byte)
         return matrix
 
-    def matrix_to_plaintext(self,matrix):
+    def matrix_to_plaintext(self, matrix):
         """
         passsimple bytes matrix to message in plaintext
         """
         plaintext = 0
-        for i in range(4):
-            for j in range(4):
+        for i in range(self.MATRIX_RANGE):
+            for j in range(self.MATRIX_RANGE):
                 plaintext |= ( matrix[i][j] << (120 - 8 * (4 * i + j)) )
         return plaintext
 
@@ -97,20 +108,20 @@ class AES:
         AES requires a separate 128-bit round key block for each round plus one more.
         """
         self.round_keys = self.plaintext_to_matrix(secret_key)
-        for i in range(4, 4 * 11):
-            self.round_keys.append([])
-            if i % 4 == 0:
+        for i in range(self.MATRIX_RANGE, 4 * 11):
+            self.round_keys.append(list())
+            if i % self.MATRIX_RANGE == 0:
                 byte = self.round_keys[i - 4][0]        \
-                     ^ self.sbox[self.round_keys[i - 1][1]]  \
-                     ^ self.rcon_b[(int)(i / 4)]
+                     ^ self.SUBSTITUTION_BOX[self.round_keys[i - 1][1]]  \
+                     ^ self.RCON_C[(int)(i / 4)]
                 self.round_keys[i].append(byte)
 
-                for j in range(1, 4):
+                for j in range(1, self.MATRIX_RANGE):
                     byte = self.round_keys[i - 4][j]    \
-                         ^ self.sbox[self.round_keys[i - 1][(j + 1) % 4]]
+                         ^ self.SUBSTITUTION_BOX[self.round_keys[i - 1][(j + 1) % 4]]
                     self.round_keys[i].append(byte)
             else:
-                for j in range(4):
+                for j in range(self.MATRIX_RANGE):
                     byte = self.round_keys[i - 4][j]    \
                          ^ self.round_keys[i - 1][j]
                     self.round_keys[i].append(byte)
@@ -121,8 +132,8 @@ class AES:
         key schedule; each subkey is the same size as the state. The subkey is added by combining each byte of the state with the corresponding 
         byte of the subkey using bitwise XOR. 
         """
-        for i in range(4):
-            for j in range(4):
+        for i in range(self.MATRIX_RANGE):
+            for j in range(self.MATRIX_RANGE):
                 s[i][j] ^= k[i][j]
     
     def sub_bytes(self, s):
@@ -131,14 +142,17 @@ class AES:
         This operation provides the non-linearity in the cipher. The S-box used is derived from the multiplicative inverse over GF(2^8),
         known to have good non-linearity properties.
         """
-        for i in range(4):
-            for j in range(4):
-                s[i][j] = self.sbox[s[i][j]]
+        for i in range(self.MATRIX_RANGE):
+            for j in range(self.MATRIX_RANGE):
+                s[i][j] = self.SUBSTITUTION_BOX[s[i][j]]
 
     def rev_sub_bytes(self, s):
-        for i in range(4):
-            for j in range(4):
-                s[i][j] = self.inversesbox[s[i][j]]
+        """
+        Reverse process of SubBytes using a inverse sustitution box
+        """
+        for i in range(self.MATRIX_RANGE):
+            for j in range(self.MATRIX_RANGE):
+                s[i][j] = self.INVERSE_SUBSTITUTION_BOX[s[i][j]]
 
     def shift_rows(self, s):
         """
@@ -173,7 +187,7 @@ class AES:
         """
         Reverse process of the previus method, reverses the mix column in particular
         """
-        for i in range(4):
+        for i in range(self.MATRIX_RANGE):
             u = self.ntime(self.ntime(s[i][0] ^ s[i][2]))
             v = self.ntime(self.ntime(s[i][1] ^ s[i][3]))
             s[i][0] ^= u
@@ -200,14 +214,14 @@ class AES:
         self.rev_shift_rows(state_matrix)
         self.rev_sub_bytes(state_matrix)
     
-    def encrypt(self, plaintext):
+    def encrypt(self, plaintext, length_bits):
         """
         Encrypt message plaintext
         """
         self.plain_state = self.plaintext_to_matrix(plaintext)
         self.add_round_key(self.plain_state, self.round_keys[:4])
-
-        for i in range(1, 10):
+        
+        for i in range(1, self.get_no_rounds(length_bits)):
             self.round_encrypt(self.plain_state, self.round_keys[4 * i : 4 * (i + 1)])
             
         self.sub_bytes(self.plain_state)
@@ -216,7 +230,7 @@ class AES:
 
         return self.matrix_to_plaintext(self.plain_state)
 
-    def decrypt(self, ciphertext):
+    def decrypt(self, ciphertext, length_bits):
         """
         Decrypt message cypher 
         """
@@ -225,9 +239,12 @@ class AES:
         self.rev_shift_rows(self.cipher_state)
         self.rev_sub_bytes(self.cipher_state)
 
-        for i in range(9, 0, -1):
+        for i in range( ( self.get_no_rounds(length_bits) - 1 ), 0, -1):
             self.round_decrypt(self.cipher_state, self.round_keys[4 * i : 4 * (i + 1)])
-            
+        
         self.add_round_key(self.cipher_state, self.round_keys[:4])
-
-        return self.matrix_to_plaintext(self.cipher_state)
+        
+        plaintext = self.matrix_to_plaintext(self.cipher_state)
+        plaintext = bytes.fromhex((hex(plaintext)[2:]))
+        plaintext = plaintext.decode('utf-8')
+        return plaintext

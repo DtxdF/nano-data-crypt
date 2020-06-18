@@ -23,10 +23,6 @@ class NanoDataCrypt:
     def get_encrypted_file(self): 
         return self._encrypted_file
     
-    @staticmethod
-    def title(self):
-        pass
-    
     def get_message(self):
         with open(self._filename,'r') as file:
             plaintext = file.read().replace('\n', '')
@@ -83,17 +79,15 @@ def main(argv):
             if args[1] == '-e' or args[0] == '--encrypt':
                 plaintext = (datacrypt.get_message()).encode('utf-8')
                 message_int  = int( plaintext.hex(), 16 )
-                encrypted = aes.encrypt(message_int)
+                encrypted = aes.encrypt(message_int,128)
                 datacrypt.file_encrypt(encrypted)
                 os.remove(datacrypt.get_filename())
             elif args[1] == '-d' or args[0] == '--decrypt':
                 encrypted = int(datacrypt.get_encrypted_message())
-                decrypted = aes.decrypt(encrypted)
-                decrypted = bytes.fromhex((hex(decrypted)[2:]))
+                decrypted = aes.decrypt(encrypted,128)
                 datacrypt.file_decrypt(decrypted)
                 os.remove(datacrypt.get_encrypted_file())
         elif opt in ('-r', '--rsa'):
-            
             rsa = RSA()
             keys = rsa.generate_keys(307, 311)
             print(keys)
