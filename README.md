@@ -6,7 +6,10 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
 # Algorithms
   - __AES__
     AES Is Symmetric key cryptography algorithm ( secret key cryptograph ) AES ( Advanced Encryption Standard )
-    The Advanced Encryption Standard (AES), also known by its original name Rijndael
+    The Advanced Encryption Standard (AES), also known by its original name Rijndael.
+    Aditional Note:
+    At the moment the key expansion implementation only supports 128 bits of key length, 
+    in the future this implementation will be changed to one that supports 128,192 and 256 Bits
   - __RSA__
     Asymmetric key cryptography algorithm based ( public key cryptography and private key cryptography )
     RSA is a public-key cryptographic algorithm based on the difficulty of factoring large integers (prime numbers).
@@ -30,7 +33,7 @@ Nano data encrypt and decrypt is small application of  implementation of the fun
     
     
 # Requirements
-The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum.
+The project can be used with **python3.8** for to build. However, it requires __python3.*__ as minimum. And 2 additional packages **getopt** & **getpass**
 
 # Installation of Package python
 ```sh
@@ -45,6 +48,10 @@ $ sudo pacman -Sy python
 # Finally check the installed version
 $ python --version
 ```
+
+# Disclaimer
+This project is not recommended for use in production environments, it is for demonstration and educational use only.
+instead you can use projects like **OpenPGP**, **GPG**, **ccencrypt**, etc
 
 License
 ----

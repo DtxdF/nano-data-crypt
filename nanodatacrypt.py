@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -16,7 +17,7 @@ class NanoDataCrypt:
         
     def __repr__(self):
         return 'NanoDataCrypt({})'.format(self._filename)
-    
+        
     def get_filename(self): 
         return self._filename
     
@@ -29,11 +30,29 @@ class NanoDataCrypt:
         file.close()
         return plaintext
     
+    def get_plaintext_lines(self):
+        plaintext_lines = []
+        with open(self._filename,'r') as file:
+            line = file.readlines()
+            plaintext_lines.append(line)
+        file.close()
+        return plaintext_lines
+    
     def get_encrypted_message(self):
         with open(self._encrypted_file,'r') as file:
-            message_encryted = file.read().replace('\n', '')
+            message_encryted = file.read()
         file.close()
         return message_encryted
+    
+    def get_encrypted_lines(self):
+        encrypted_lines = []
+        with open(self._encrypted_file,'r') as file:
+            line = file.readlines()
+            if line == '':
+                line = b''
+            encrypted_lines.append(line)
+        file.close()
+        return encrypted_lines
     
     def assert_plaintext(self,plaintext,decrypted):
         if plaintext == decrypted:
@@ -51,6 +70,12 @@ class NanoDataCrypt:
         file = open(self._filename,'w')
         file.write(str(message_decryted))
         file.close()
+    
+    def get_secret_key(self):
+        secret_key = getpass.getpass()
+        secret_key = secret_key.encode('utf-8')
+        secret_key = int( secret_key.hex(), 16 )
+        return secret_key
     
     @staticmethod
     def usage():
@@ -72,21 +97,36 @@ def main(argv):
         if opt in ('-h', '--help'):
             NanoDataCrypt.usage()
         elif opt in ('-a', '--aes'):
-            secret_key   = input('Enter your secret phrase:')
-            secret_key   = secret_key.encode('utf-8')
-            secret_key = int( secret_key.hex(), 16 ) 
+            secret_key = datacrypt.get_secret_key()
             aes = AES(secret_key)
             if args[1] == '-e' or args[0] == '--encrypt':
-                plaintext = (datacrypt.get_message()).encode('utf-8')
-                message_int  = int( plaintext.hex(), 16 )
-                encrypted = aes.encrypt(message_int,128)
-                datacrypt.file_encrypt(encrypted)
+                plaintext_lines = datacrypt.get_plaintext_lines()
+                file = open(args[0]+'.cpt','w')
+                for plaintext in plaintext_lines[0]:
+                    plaintext = (plaintext.replace('\n', '')).encode('utf-8')
+                    if plaintext != b'':
+                        message_int = int( plaintext.hex(), 16 )
+                        encrypted = aes.encrypt(message_int,128)
+                        file.write(str(encrypted)+'\n')
+                    else:
+                        file.write('\n')
+                file.close()
                 os.remove(datacrypt.get_filename())
             elif args[1] == '-d' or args[0] == '--decrypt':
-                encrypted = int(datacrypt.get_encrypted_message())
-                decrypted = aes.decrypt(encrypted,128)
-                datacrypt.file_decrypt(decrypted)
+                encrypted_lines = datacrypt.get_encrypted_lines()
+                file = open(args[0],'w')
+                for cyphertext in encrypted_lines[0]:
+                    if cyphertext != '\n':
+                         plaintext = aes.decrypt( int( cyphertext, 10 ) ,128)
+                         plaintext = bytes.fromhex((hex(plaintext)[2:]))
+                         print(plaintext)
+                         file.write(str(plaintext)+'\n')
+                    else:
+                        print('empty line!')
+                        file.write('\n')
+                file.close()
                 os.remove(datacrypt.get_encrypted_file())
+        
         elif opt in ('-r', '--rsa'):
             rsa = RSA()
             keys = rsa.generate_keys(307, 311)
