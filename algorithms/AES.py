@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+# Very important note!
+# This implementation is a fork of the original implementation of: https://github.com/bozhu/AES-Python
+# If you would like to know more about his work and his person : https://about.bozhu.me/
+# Here I leave the link of the original author, of this implementation : https://github.com/bozhu/AES-Python/blob/master/aes.py
+
+import sys
+
 class AES:
     """
     AES Is Symmetric key cryptography algorithm ( secret key cryptograph ) AES ( Advanced Encryption Standard )
@@ -61,6 +68,7 @@ class AES:
         0x17, 0x2B, 0x04, 0x7E, 0xBA, 0x77, 0xD6, 0x26, 0xE1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0C, 0x7D,
     )
     
+                            
     ntime = lambda self, n: (((n << 1) ^ 0x1B) & 0xFF) if (n & 0x80) else (n << 1)
     
     # In the MixColumns step, the four bytes of each column of the state are combined using an invertible linear transformation. 
@@ -71,7 +79,7 @@ class AES:
     def __init__(self, secret_key):
         self.key_expansion(secret_key)
         
-    def get_no_rounds(self, length_bits):
+    def get_no_rounds(self, key_size):
         """
         Return amount rounds correponding length bits
         """
@@ -79,8 +87,8 @@ class AES:
             128: 10, 
             192: 12, 
             256: 14,
-        } 
-        return bits_round.get(length_bits, 'bits_keys')
+        }
+        return bits_round.get(int(key_size), 'key_size')
     
     def plaintext_to_matrix(self, plaintext):
         """
@@ -94,7 +102,7 @@ class AES:
 
     def matrix_to_plaintext(self, matrix):
         """
-        passsimple bytes matrix to message in plaintext
+        Pass simple bytes matrix to message in plaintext
         """
         plaintext = 0
         for i in range(self.MATRIX_RANGE):
@@ -106,6 +114,8 @@ class AES:
         """
         KeyExpansion : round keys are derived from the cipher key using Rijndael's key schedule.
         AES requires a separate 128-bit round key block for each round plus one more.
+        At the moment the key expansion implementation only supports 128 bits of key length, 
+        in the future this implementation will be changed to one that supports 128,192 and 256 Bits 
         """
         self.round_keys = self.plaintext_to_matrix(secret_key)
         for i in range(self.MATRIX_RANGE, 4 * 11):
@@ -214,15 +224,19 @@ class AES:
         self.rev_shift_rows(state_matrix)
         self.rev_sub_bytes(state_matrix)
     
-    def encrypt(self, plaintext, length_bits):
+    def encrypt(self, plaintext, key_size):
         """
         Encrypt message plaintext
         """
         self.plain_state = self.plaintext_to_matrix(plaintext)
         self.add_round_key(self.plain_state, self.round_keys[:4])
         
-        for i in range(1, self.get_no_rounds(length_bits)):
-            self.round_encrypt(self.plain_state, self.round_keys[4 * i : 4 * (i + 1)])
+        for i in range(1, self.get_no_rounds(key_size)):
+            try:
+                self.round_encrypt(self.plain_state, self.round_keys[4 * i : 4 * (i + 1)])
+            except IndexError:
+                print(f':: IndexError: the n rounds corresponding to the selected {key_size}-Bits key size were not applied')
+                sys.exit(2)
             
         self.sub_bytes(self.plain_state)
         self.shift_rows(self.plain_state)
@@ -230,7 +244,7 @@ class AES:
 
         return self.matrix_to_plaintext(self.plain_state)
 
-    def decrypt(self, ciphertext, length_bits):
+    def decrypt(self, ciphertext, key_size):
         """
         Decrypt message cypher 
         """
@@ -239,12 +253,13 @@ class AES:
         self.rev_shift_rows(self.cipher_state)
         self.rev_sub_bytes(self.cipher_state)
 
-        for i in range( ( self.get_no_rounds(length_bits) - 1 ), 0, -1):
-            self.round_decrypt(self.cipher_state, self.round_keys[4 * i : 4 * (i + 1)])
-        
+        for i in range( ( self.get_no_rounds(key_size) - 1 ), 0, -1):
+            try:
+                self.round_decrypt(self.cipher_state, self.round_keys[4 * i : 4 * (i + 1)])
+            except IndexError:
+                print(f':: IndexError: the n rounds inverse corresponding to the selected {key_size}-Bits key size were not applied')
+                sys.exit(2)
+                
         self.add_round_key(self.cipher_state, self.round_keys[:4])
         
-        plaintext = self.matrix_to_plaintext(self.cipher_state)
-        plaintext = bytes.fromhex((hex(plaintext)[2:]))
-        plaintext = plaintext.decode('utf-8')
-        return plaintext
+        return self.matrix_to_plaintext(self.cipher_state)
