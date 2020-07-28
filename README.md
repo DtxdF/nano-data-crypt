@@ -49,7 +49,7 @@ If you don't want to install python3.8 on your main operating system, you can in
     python nanodatacrypt.py --file=sample_rsa.txt --algorithm=rsa --encrypt 
     python nanodatacrypt.py --file=sample_rsa.txt --algorithm=rsa --decrypt
 
-# Installation of Package python
+# Installation
 ```sh
 # normally this package is already installed in most unix-based 
 # distributions e.g. GNU/Linux, Freebsd, etc.
@@ -90,7 +90,9 @@ If you are looking for an api for the development/use of cryptographic systems I
    -   [Fernet (symmetric encryption)](https://cryptography.io/en/latest/fernet/)
         -   Fernet is an authenticated implementation of symmetric cryptography, also known as **secret key**.
             Fernet also has support for implementing key rotation through MultiFernet.
-    -   [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/src/introduction.html)
+            
+   -   [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/src/introduction.html/)
+    
         -   PyCryptodome is a standalone package of low-level cryptographic systems.
             It supports Python 2.6 and 2.7, Python 3.4 and newer, and PyPy.
         -   Authenticated encryption modes (GCM, CCM, EAX, SIV, OCB)
