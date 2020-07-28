@@ -19,7 +19,7 @@ If you don't want to install python3.8 on your main operating system, you can in
     Additional note: Be careful when using this implementation it only has a small bug that returns a file with an extra line break,
     and removes a couple of special characters.
     
-  - __RSA__
+  - __RSA__ (**Rivest–Shamir–Adleman**)
     Asymmetric key cryptography algorithm based ( public key cryptography and private key cryptography )
     RSA is a public-key cryptographic algorithm based on the difficulty of factoring large integers (prime numbers).
     The algorithm is typically used for both encryption and authentication (digital signature).
@@ -91,7 +91,7 @@ If you are looking for an api for the development/use of cryptographic systems I
         -   Fernet is an authenticated implementation of symmetric cryptography, also known as **secret key**.
             Fernet also has support for implementing key rotation through MultiFernet.
             
-   -   [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/src/introduction.html/)
+   -   [Pycryptodome](https://pycryptodome.readthedocs.io/en/latest/)
     
         -   PyCryptodome is a standalone package of low-level cryptographic systems.
             It supports Python 2.6 and 2.7, Python 3.4 and newer, and PyPy.
